@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 import { Search, Menu, Video } from "lucide-react";
+import { UserMenu } from "@/components/UserMenu";
 
 interface NavigationProps {
   onSearch: (query: string) => void;
@@ -9,6 +11,7 @@ interface NavigationProps {
 
 export function Navigation({ onSearch }: NavigationProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: session, status } = useSession();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ export function Navigation({ onSearch }: NavigationProps) {
             </div>
             <button
               type="submit"
-              className="px-6 py-2 bg-gray-50 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="cursor-pointer px-6 py-2 bg-gray-50 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Search"
             >
               <Search className="w-5 h-5 text-gray-600" aria-hidden="true" />
@@ -59,7 +62,21 @@ export function Navigation({ onSearch }: NavigationProps) {
           </div>
         </form>
 
-        <div className="hidden md:block w-24" aria-hidden="true" />
+        <div className="flex items-center gap-3">
+          {status === "loading" ? (
+            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+          ) : session ? (
+            <UserMenu session={session} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => signIn("google")}
+              className="cursor-pointer px-4 py-2 text-sm font-medium text-blue-600 border border-blue-300 rounded-full hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );

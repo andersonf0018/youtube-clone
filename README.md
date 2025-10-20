@@ -4,14 +4,17 @@ A modern YouTube-style video discovery and playback platform built with Next.js 
 
 ## Features
 
+- 🔐 **Google OAuth2 Authentication** - Secure sign-in with Google Identity Services
 - 🎥 **Video Discovery** - Browse popular videos with real-time data from YouTube API
 - 🔍 **Smart Search** - Search videos with persistent history (LocalStorage)
+- 👤 **User Profiles** - Display user avatar and name when authenticated
 - 📱 **Responsive Design** - Mobile-first UI that works on all screen sizes
 - ⚡ **Optimized Performance** - Server components, smart caching, and lazy loading
 - 🎨 **Modern UI** - Clean, accessible interface with Tailwind CSS
 - 🧪 **Well Tested** - Comprehensive unit tests with Vitest and React Testing Library
 - 📊 **State Management** - React Query for server state, Zustand for UI state
 - ♿ **Accessible** - WCAG 2.2 AA compliant with proper ARIA labels
+- 🔒 **Secure Sessions** - HTTP-only cookies with JWT strategy
 
 ## Tech Stack
 
@@ -23,6 +26,11 @@ A modern YouTube-style video discovery and playback platform built with Next.js 
 ### State Management
 - **@tanstack/react-query** - Server state, caching, and data synchronization
 - **Zustand** - Lightweight client-side state management
+
+### Authentication
+- **NextAuth.js v5** - Authentication framework
+- **Google OAuth2** - Secure sign-in provider
+- **JWT** - Session management with HTTP-only cookies
 
 ### Styling
 - **Tailwind CSS 4** - Utility-first CSS framework
@@ -77,6 +85,7 @@ youtube-clone/
 ### Prerequisites
 
 - Node.js 18+ and npm
+- Google Cloud account (for OAuth2)
 - YouTube Data API v3 key (optional - uses mock data without it)
 
 ### Installation
@@ -92,9 +101,21 @@ cd youtube-clone
 npm install
 ```
 
-3. (Optional) Set up YouTube API key:
+3. Set up environment variables:
 ```bash
-echo "YOUTUBE_API_KEY=your_api_key_here" > .env.local
+cp .env.example .env.local
+```
+
+Edit `.env.local` with your credentials:
+```env
+# Required for authentication
+NEXTAUTH_SECRET=your_secret_here  # Generate with: openssl rand -base64 32
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Optional - uses mock data without it
+YOUTUBE_API_KEY=your_youtube_api_key
 ```
 
 4. Run the development server:
@@ -197,8 +218,14 @@ Optimizations:
 
 1. Push code to GitHub
 2. Import project in Vercel
-3. Add `YOUTUBE_API_KEY` environment variable
-4. Deploy
+3. Add environment variables:
+   - `NEXTAUTH_SECRET`
+   - `NEXTAUTH_URL` (your production URL)
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `YOUTUBE_API_KEY` (optional)
+4. Update Google OAuth redirect URIs with production URL
+5. Deploy
 
 ### Other Platforms
 
@@ -207,7 +234,7 @@ npm run build
 npm run start
 ```
 
-Set `YOUTUBE_API_KEY` environment variable in your hosting platform.
+Set all required environment variables in your hosting platform.
 
 ## License
 
