@@ -49,8 +49,6 @@ export interface YouTubeVideo {
 export interface YouTubeSearchResultId {
   kind: string;
   videoId?: string;
-  channelId?: string;
-  playlistId?: string;
 }
 
 export interface YouTubeSearchResult {
@@ -90,10 +88,13 @@ export interface NormalizedVideo {
   duration?: string;
 }
 
+export type SearchOrder = "relevance" | "date" | "viewCount" | "rating";
+
 export interface SearchParams {
   query: string;
   maxResults?: number;
   pageToken?: string;
+  order?: SearchOrder;
 }
 
 export interface VideoParams {

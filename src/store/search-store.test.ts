@@ -67,17 +67,17 @@ describe("useSearchStore", () => {
     expect(state.searchHistory[2].query).toBe("vue");
   });
 
-  it("should limit history to 10 items", () => {
+  it("should limit history to 20 items", () => {
     const { addToHistory } = useSearchStore.getState();
 
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 25; i++) {
       addToHistory(`query ${i}`);
     }
 
     const state = useSearchStore.getState();
-    expect(state.searchHistory).toHaveLength(10);
-    expect(state.searchHistory[0].query).toBe("query 12");
-    expect(state.searchHistory[9].query).toBe("query 3");
+    expect(state.searchHistory).toHaveLength(20);
+    expect(state.searchHistory[0].query).toBe("query 25");
+    expect(state.searchHistory[19].query).toBe("query 6");
   });
 
   it("should remove specific query from history", () => {

@@ -6,7 +6,6 @@ import { VideoGrid } from "@/components/VideoGrid";
 import { VideoCardSkeleton } from "@/components/VideoCardSkeleton";
 import { useInfinitePopularVideos } from "@/hooks/use-popular-videos";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { useSearchStore } from "@/store/search-store";
 import { usePlayerStore } from "@/store/player-store";
 
 export default function Home() {
@@ -19,7 +18,6 @@ export default function Home() {
     isFetchingNextPage,
   } = useInfinitePopularVideos();
   const { targetRef, isIntersecting } = useIntersectionObserver();
-  const { addToHistory } = useSearchStore();
   const { setCurrentVideoId } = usePlayerStore();
 
   useEffect(() => {
@@ -28,19 +26,21 @@ export default function Home() {
     }
   }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSearch = (query: string) => {
-    addToHistory(query);
-  };
-
   const handleVideoClick = (videoId: string) => {
     setCurrentVideoId(videoId);
   };
 
-  const allVideos = data?.pages.flatMap((page) => page.videos) ?? [];
+  const allVideos =
+    data?.pages.flatMap((page) => page.videos).reduce((unique, video) => {
+      if (!unique.find((v) => v.id === video.id)) {
+        unique.push(video);
+      }
+      return unique;
+    }, [] as typeof data.pages[0]["videos"]) ?? [];
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onSearch={handleSearch} />
+      <Navigation />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
         {error && (

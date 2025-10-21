@@ -1,0 +1,1 @@
+export { SearchHistoryDropdown } from "./SearchHistoryDropdown";

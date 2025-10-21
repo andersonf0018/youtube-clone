@@ -72,12 +72,45 @@ export const youtubeClient = {
     const searchParams = new URLSearchParams({
       query: params.query,
       maxResults: String(params.maxResults ?? 20),
+      type: "video",
       ...(params.pageToken && { pageToken: params.pageToken }),
+      ...(params.order && { order: params.order }),
     });
 
     return fetchJSON<YouTubeSearchResponse>(
       `${API_BASE_URL}/search?${searchParams}`
     );
+  },
+
+  async searchVideosWithPagination(params: SearchParams): Promise<{
+    videos: Array<{
+      id: string;
+      title: string;
+      description: string;
+      thumbnailUrl: string;
+      channelId: string;
+      channelTitle: string;
+      publishedAt: string;
+    }>;
+    nextPageToken?: string;
+  }> {
+    const response = await this.searchVideos(params);
+    return {
+      videos: response.items
+        .filter((item) => item.id.videoId)
+        .map((item) => ({
+          id: item.id.videoId!,
+          title: item.snippet.title,
+          description: item.snippet.description,
+          thumbnailUrl:
+            item.snippet.thumbnails.high?.url ||
+            item.snippet.thumbnails.medium.url,
+          channelId: item.snippet.channelId,
+          channelTitle: item.snippet.channelTitle,
+          publishedAt: item.snippet.publishedAt,
+        })),
+      nextPageToken: response.nextPageToken,
+    };
   },
 
   async getVideo(params: VideoParams): Promise<NormalizedVideo> {

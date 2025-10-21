@@ -15,7 +15,7 @@ interface SearchState {
   removeFromHistory: (query: string) => void;
 }
 
-const MAX_HISTORY_ITEMS = 10;
+const MAX_HISTORY_ITEMS = 20;
 
 export const useSearchStore = create<SearchState>()(
   persist(

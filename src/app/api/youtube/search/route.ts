@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const query = searchParams.get("query");
   const maxResults = searchParams.get("maxResults") || "20";
   const pageToken = searchParams.get("pageToken");
+  const order = searchParams.get("order") || "relevance";
 
   if (!query) {
     return NextResponse.json(
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
       part: "snippet",
       q: query,
       type: "video",
+      order,
       maxResults,
       key: YOUTUBE_API_KEY,
       ...(pageToken && { pageToken }),
