@@ -1,20 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
-import { VideoCard } from "@/components/VideoCard";
-import { usePopularVideos } from "@/hooks/use-popular-videos";
+import { VideoGrid } from "@/components/VideoGrid";
+import { VideoCardSkeleton } from "@/components/VideoCardSkeleton";
+import { useInfinitePopularVideos } from "@/hooks/use-popular-videos";
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useSearchStore } from "@/store/search-store";
 import { usePlayerStore } from "@/store/player-store";
-import {
-  formatViewCount,
-  formatDuration,
-  formatTimeAgo,
-} from "@/lib/utils/formatters";
 
 export default function Home() {
-  const { data: videos, isLoading, error } = usePopularVideos();
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfinitePopularVideos();
+  const { targetRef, isIntersecting } = useIntersectionObserver();
   const { addToHistory } = useSearchStore();
   const { setCurrentVideoId } = usePlayerStore();
+
+  useEffect(() => {
+    if (isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSearch = (query: string) => {
     addToHistory(query);
@@ -24,20 +36,13 @@ export default function Home() {
     setCurrentVideoId(videoId);
   };
 
+  const allVideos = data?.pages.flatMap((page) => page.videos) ?? [];
+
   return (
     <div className="min-h-screen bg-white">
       <Navigation onSearch={handleSearch} />
 
-      <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto">
-        {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-gray-600">Loading popular videos...</p>
-            </div>
-          </div>
-        )}
-
+      <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
         {error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center max-w-md">
@@ -55,27 +60,33 @@ export default function Home() {
           </div>
         )}
 
-        {!isLoading && !error && videos && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8">
-            {videos.map((video) => (
-              <VideoCard
-                key={video.id}
-                title={video.title}
-                channelName={video.channelTitle}
-                views={formatViewCount(video.viewCount)}
-                uploadedAt={formatTimeAgo(video.publishedAt)}
-                duration={formatDuration(video.duration)}
-                thumbnailUrl={video.thumbnailUrl}
-                onClick={() => handleVideoClick(video.id)}
-              />
-            ))}
-          </div>
-        )}
+        {!error && (
+          <>
+            <VideoGrid
+              videos={allVideos}
+              isLoading={isLoading}
+              onVideoClick={handleVideoClick}
+              skeletonCount={12}
+            />
 
-        {!isLoading && !error && videos && videos.length === 0 && (
-          <div className="flex items-center justify-center py-20">
-            <p className="text-gray-600">No videos found</p>
-          </div>
+            {isFetchingNextPage && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 mt-8">
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <VideoCardSkeleton key={`loading-${index}`} />
+                ))}
+              </div>
+            )}
+
+            <div ref={targetRef} className="h-20" aria-hidden="true" />
+
+            {!isLoading && !hasNextPage && allVideos.length > 0 && (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-gray-500 text-sm">
+                  You&apos;ve reached the end
+                </p>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

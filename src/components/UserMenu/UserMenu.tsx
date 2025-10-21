@@ -38,7 +38,7 @@ export function UserMenu({ session }: UserMenuProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+        className="cursor-pointer flex items-center gap-2 p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
         aria-label="User menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -92,7 +92,7 @@ export function UserMenu({ session }: UserMenuProps) {
             <button
               type="button"
               onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              className="cursor-pointer w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               role="menuitem"
             >
               <LogOut className="w-4 h-4" />

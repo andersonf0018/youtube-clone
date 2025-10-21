@@ -94,7 +94,10 @@ export const youtubeClient = {
 
   async getPopularVideos(
     params: PopularVideosParams = {}
-  ): Promise<NormalizedVideo[]> {
+  ): Promise<{
+    videos: NormalizedVideo[];
+    nextPageToken?: string;
+  }> {
     const searchParams = new URLSearchParams({
       maxResults: String(params.maxResults ?? 20),
       ...(params.regionCode && { regionCode: params.regionCode }),
@@ -105,7 +108,10 @@ export const youtubeClient = {
       `${API_BASE_URL}/popular?${searchParams}`
     );
 
-    return response.items.map(normalizeVideo);
+    return {
+      videos: response.items.map(normalizeVideo),
+      nextPageToken: response.nextPageToken,
+    };
   },
 
   async getVideosByIds(ids: string[]): Promise<NormalizedVideo[]> {
