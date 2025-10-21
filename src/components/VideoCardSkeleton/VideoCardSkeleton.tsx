@@ -1,5 +1,3 @@
-"use client";
-
 export function VideoCardSkeleton() {
   return (
     <article className="flex flex-col gap-3 animate-pulse">

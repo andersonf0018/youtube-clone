@@ -1,0 +1,1 @@
+export { CollapsibleDescription } from "./CollapsibleDescription";

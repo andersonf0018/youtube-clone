@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { VideoGrid } from "@/components/VideoGrid";
 import { VideoCardSkeleton } from "@/components/VideoCardSkeleton";
 import { useInfinitePopularVideos } from "@/hooks/use-popular-videos";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { usePlayerStore } from "@/store/player-store";
 
 export default function Home() {
+  const router = useRouter();
   const {
     data,
     isLoading,
@@ -18,7 +19,6 @@ export default function Home() {
     isFetchingNextPage,
   } = useInfinitePopularVideos();
   const { targetRef, isIntersecting } = useIntersectionObserver();
-  const { setCurrentVideoId } = usePlayerStore();
 
   useEffect(() => {
     if (isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -27,7 +27,7 @@ export default function Home() {
   }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleVideoClick = (videoId: string) => {
-    setCurrentVideoId(videoId);
+    router.push(`/watch/${videoId}`);
   };
 
   const allVideos =

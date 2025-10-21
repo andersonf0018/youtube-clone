@@ -156,6 +156,60 @@ export const youtubeClient = {
 
     return response.items.map(normalizeVideo);
   },
+
+  async getRelatedVideos(params: {
+    videoId: string;
+    maxResults?: number;
+    pageToken?: string;
+  }): Promise<{
+    videos: Array<{
+      id: string;
+      title: string;
+      description: string;
+      thumbnailUrl: string;
+      channelId: string;
+      channelTitle: string;
+      publishedAt: string;
+      viewCount?: string;
+      duration?: string;
+    }>;
+    nextPageToken?: string;
+  }> {
+    const searchParams = new URLSearchParams({
+      videoId: params.videoId,
+      maxResults: String(params.maxResults ?? 20),
+      ...(params.pageToken && { pageToken: params.pageToken }),
+    });
+
+    const response = await fetchJSON<YouTubeSearchResponse>(
+      `${API_BASE_URL}/related?${searchParams}`
+    );
+
+    const videoIds = response.items
+      .filter((item) => item.id.videoId)
+      .map((item) => item.id.videoId!);
+
+    if (videoIds.length === 0) {
+      return { videos: [], nextPageToken: response.nextPageToken };
+    }
+
+    const detailedVideos = await this.getVideosByIds(videoIds);
+
+    return {
+      videos: detailedVideos.map((video) => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        thumbnailUrl: video.thumbnailUrl,
+        channelId: video.channelId,
+        channelTitle: video.channelTitle,
+        publishedAt: video.publishedAt,
+        viewCount: video.viewCount,
+        duration: video.duration,
+      })),
+      nextPageToken: response.nextPageToken,
+    };
+  },
 };
 
 export type { YouTubeClientError };

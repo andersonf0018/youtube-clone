@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface VideoCardProps {
   title: string;
   channelName: string;
@@ -28,11 +30,13 @@ export function VideoCard({
         aria-label={`Play ${title}`}
       >
         {thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={thumbnailUrl}
             alt=""
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-200"
+            priority={false}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400">

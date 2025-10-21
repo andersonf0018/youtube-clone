@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { Search, Menu, Video } from "lucide-react";
 import { UserMenu } from "@/components/UserMenu";
@@ -61,18 +62,13 @@ export function Navigation({ onSearch }: NavigationProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
       <div className="flex items-center gap-4 px-4 py-3 max-w-[2000px] mx-auto">
-        <button
-          type="button"
-          aria-label="Menu"
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+        <Link
+          href="/"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
         >
-          <Menu className="w-6 h-6" />
-        </button>
-
-        <div className="flex items-center gap-2">
           <Video className="w-8 h-8 text-red-600" aria-hidden="true" />
           <h1 className="text-xl font-semibold hidden sm:block">VideoTube</h1>
-        </div>
+        </Link>
 
         <div
           ref={searchContainerRef}

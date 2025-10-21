@@ -1,20 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { VideoGrid } from "@/components/VideoGrid";
 import { VideoCardSkeleton } from "@/components/VideoCardSkeleton";
 import { useInfiniteSearchVideos } from "@/hooks/use-search-videos";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
-import { usePlayerStore } from "@/store/player-store";
 import { useSearchStore } from "@/store/search-store";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get("q") || "";
   const { setCurrentQuery } = useSearchStore();
-  const { setCurrentVideoId } = usePlayerStore();
 
   useEffect(() => {
     if (query) {
@@ -46,7 +45,7 @@ export default function SearchPage() {
   }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleVideoClick = (videoId: string) => {
-    setCurrentVideoId(videoId);
+    router.push(`/watch/${videoId}`);
   };
 
   const allVideos =

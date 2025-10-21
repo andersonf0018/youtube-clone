@@ -1,0 +1,1 @@
+export { RelatedVideoCard } from "./RelatedVideoCard";

@@ -29,7 +29,7 @@ describe("VideoCard", () => {
     const thumbnail = screen.getByRole("button", { name: /Play Test Video Title/i });
     const img = thumbnail.querySelector("img");
     expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute("src", "https://example.com/thumb.jpg");
+    expect(img).toHaveAttribute("src", expect.stringContaining("thumb.jpg"));
   });
 
   it("should display placeholder when no thumbnail provided", () => {
