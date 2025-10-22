@@ -26,8 +26,8 @@ describe("VideoCard", () => {
   it("should display thumbnail when provided", () => {
     render(<VideoCard {...defaultProps} thumbnailUrl="https://example.com/thumb.jpg" />);
 
-    const thumbnail = screen.getByRole("button", { name: /Play Test Video Title/i });
-    const img = thumbnail.querySelector("img");
+    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
+    const img = button.querySelector("img");
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", expect.stringContaining("thumb.jpg"));
   });
@@ -44,7 +44,7 @@ describe("VideoCard", () => {
 
     render(<VideoCard {...defaultProps} onClick={onClickMock} />);
 
-    const button = screen.getByRole("button", { name: /Play Test Video Title/i });
+    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
     await user.click(button);
 
     expect(onClickMock).toHaveBeenCalledTimes(1);
@@ -53,8 +53,9 @@ describe("VideoCard", () => {
   it("should have proper accessibility attributes", () => {
     render(<VideoCard {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Play Test Video Title/i });
+    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
     expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("aria-label", "Watch Test Video Title by Test Channel");
   });
 
   it("should display duration badge", () => {
