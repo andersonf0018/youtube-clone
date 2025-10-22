@@ -1,11 +1,12 @@
 import { ReactElement, ReactNode } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { SessionProvider } from "next-auth/react";
+import { Session } from "next-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 interface TestProvidersProps {
   children: ReactNode;
-  session?: any;
+  session?: Session | null;
 }
 
 export function TestProviders({ children, session = null }: TestProvidersProps) {
@@ -27,7 +28,7 @@ export function TestProviders({ children, session = null }: TestProvidersProps) 
 }
 
 interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
-  session?: any;
+  session?: Session | null;
 }
 
 export function renderWithProviders(
@@ -42,7 +43,7 @@ export function renderWithProviders(
   });
 }
 
-export function createMockSession(overrides = {}) {
+export function createMockSession(overrides: Partial<Session> = {}): Session {
   return {
     user: {
       id: "test-user-id",

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Navigation } from "@/components/Navigation";
 import { FileQuestion, Home, ArrowLeft } from "lucide-react";

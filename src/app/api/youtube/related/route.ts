@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { YouTubeSearchResponse } from "@/types/youtube";
+import type {
+  YouTubeSearchResponse,
+  YouTubeVideo,
+} from "@/types/youtube";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest) {
       nextPageToken: data.nextPageToken,
       prevPageToken: data.prevPageToken,
       pageInfo: data.pageInfo,
-      items: data.items.map((item: any) => ({
+      items: data.items.map((item: YouTubeVideo) => ({
         kind: "youtube#searchResult",
         etag: item.etag,
         id: {
@@ -74,7 +77,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function getMockRelatedResponse(videoId: string): YouTubeSearchResponse {
+function getMockRelatedResponse(_videoId: string): YouTubeSearchResponse {
   return {
     kind: "youtube#searchListResponse",
     etag: "mock-etag",

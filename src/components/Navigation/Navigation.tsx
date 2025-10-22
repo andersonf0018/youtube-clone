@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
-import { Search, Menu, Video } from "lucide-react";
+import { Search, Video } from "lucide-react";
 import { UserMenu } from "@/components/UserMenu";
 import { SearchHistoryDropdown } from "@/components/SearchHistoryDropdown";
 import { useSearchStore } from "@/store/search-store";

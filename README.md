@@ -235,7 +235,12 @@ Excluded from coverage:
 - `src/test/`
 - `*.config.ts`
 - Test files (`**/*.test.{ts,tsx}`)
-- Type definitions (`**/types/**`)
+- Type definitions (`**/types/**`, `**/*.d.ts`)
+- Index files (`**/index.ts`)
+- API routes (`src/app/api/**`)
+- Auth configuration (`src/lib/auth.ts`)
+- Root layout (`src/app/layout.tsx`)
+- Provider components (`src/components/providers/**`)
 
 ### Running Tests
 

@@ -1,8 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RelatedVideosSidebar } from "./RelatedVideosSidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { NormalizedVideo } from "@/types/youtube";
+
+interface MockInfiniteQueryResult {
+  data:
+    | {
+        pages: Array<{ videos: NormalizedVideo[]; nextPageToken?: string }>;
+        pageParams: Array<string | undefined>;
+      }
+    | undefined;
+  isLoading: boolean;
+  error: Error | null;
+  fetchNextPage: ReturnType<typeof vi.fn>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+}
 
 vi.mock("@/hooks/use-related-videos", () => ({
   useInfiniteRelatedVideos: vi.fn(),
@@ -66,7 +81,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -87,7 +102,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -105,7 +120,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -128,7 +143,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={onVideoClickMock} />
@@ -151,7 +166,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -171,7 +186,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: true,
       isFetchingNextPage: true,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -195,7 +210,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: false,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />
@@ -216,7 +231,7 @@ describe("RelatedVideosSidebar", () => {
       fetchNextPage: vi.fn(),
       hasNextPage: true,
       isFetchingNextPage: false,
-    } as any);
+    } as MockInfiniteQueryResult);
 
     const { container } = renderWithClient(
       <RelatedVideosSidebar videoId="test-id" onVideoClick={vi.fn()} />

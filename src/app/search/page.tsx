@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { VideoGrid } from "@/components/VideoGrid";
@@ -9,7 +9,7 @@ import { useInfiniteSearchVideos } from "@/hooks/use-search-videos";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useSearchStore } from "@/store/search-store";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("q") || "";
@@ -139,5 +139,24 @@ export default function SearchPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white">
+          <Navigation />
+          <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
+            <div className="flex items-center justify-center py-20">
+              <p className="text-gray-500">Loading...</p>
+            </div>
+          </main>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }

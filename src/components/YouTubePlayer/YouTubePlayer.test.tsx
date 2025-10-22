@@ -2,8 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import { YouTubePlayer } from "./YouTubePlayer";
 
+interface MockPlayer {
+  destroy: ReturnType<typeof vi.fn>;
+  loadVideoById: ReturnType<typeof vi.fn>;
+  playVideo: ReturnType<typeof vi.fn>;
+  pauseVideo: ReturnType<typeof vi.fn>;
+}
+
+interface MockYT {
+  Player: ReturnType<typeof vi.fn>;
+}
+
+declare global {
+  var YT: MockYT | undefined;
+}
+
 describe("YouTubePlayer", () => {
-  let mockPlayer: any;
+  let mockPlayer: MockPlayer;
 
   beforeEach(() => {
     mockPlayer = {
@@ -13,8 +28,8 @@ describe("YouTubePlayer", () => {
       pauseVideo: vi.fn(),
     };
 
-    (global as any).YT = {
-      Player: vi.fn().mockImplementation((element, options) => {
+    global.YT = {
+      Player: vi.fn().mockImplementation((_element, options) => {
         setTimeout(() => {
           options.events?.onReady?.();
         }, 0);
@@ -24,7 +39,7 @@ describe("YouTubePlayer", () => {
   });
 
   afterEach(() => {
-    delete (global as any).YT;
+    delete global.YT;
     vi.clearAllMocks();
   });
 
@@ -39,7 +54,7 @@ describe("YouTubePlayer", () => {
     render(<YouTubePlayer videoId="test-video-id" />);
 
     await waitFor(() => {
-      expect((global as any).YT.Player).toHaveBeenCalled();
+      expect(global.YT?.Player).toHaveBeenCalled();
     }, { timeout: 3000 });
   });
 

@@ -50,7 +50,7 @@ describe("RelatedVideoCard", () => {
   });
 
   it("should render without views", () => {
-    const { views, ...propsWithoutViews } = defaultProps;
+    const { views: _views, ...propsWithoutViews } = defaultProps;
     render(<RelatedVideoCard {...propsWithoutViews} />);
 
     expect(screen.getByText("1 week ago")).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe("RelatedVideoCard", () => {
   });
 
   it("should render without duration", () => {
-    const { duration, ...propsWithoutDuration } = defaultProps;
+    const { duration: _duration, ...propsWithoutDuration } = defaultProps;
     render(<RelatedVideoCard {...propsWithoutDuration} />);
 
     expect(screen.getByText("Related Video Title")).toBeInTheDocument();

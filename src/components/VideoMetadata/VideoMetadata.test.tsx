@@ -4,6 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { VideoMetadata } from "./VideoMetadata";
 import type { NormalizedVideo } from "@/types/youtube";
 
+interface NavigatorWithShare extends Navigator {
+  share?: (data?: ShareData) => Promise<void>;
+}
+
 describe("VideoMetadata", () => {
   const mockVideo: NormalizedVideo = {
     id: "test-id",
@@ -37,7 +41,7 @@ describe("VideoMetadata", () => {
       configurable: true,
     });
 
-    delete (window.navigator as any).share;
+    delete (window.navigator as NavigatorWithShare).share;
   });
 
   it("should render video title", () => {
@@ -84,7 +88,7 @@ describe("VideoMetadata", () => {
   it("should use Web Share API when available", async () => {
     const user = userEvent.setup();
     const mockShare = vi.fn().mockResolvedValue(undefined);
-    (window as any).navigator.share = mockShare;
+    (window.navigator as NavigatorWithShare).share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 
@@ -105,7 +109,7 @@ describe("VideoMetadata", () => {
     const mockShare = vi.fn().mockImplementation(
       () => new Promise((resolve) => setTimeout(resolve, 100))
     );
-    (window as any).navigator.share = mockShare;
+    (window.navigator as NavigatorWithShare).share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 
@@ -128,7 +132,7 @@ describe("VideoMetadata", () => {
           resolveShare = resolve;
         })
     );
-    (window as any).navigator.share = mockShare;
+    (window.navigator as NavigatorWithShare).share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 
@@ -152,7 +156,7 @@ describe("VideoMetadata", () => {
     const user = userEvent.setup();
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const mockShare = vi.fn().mockRejectedValue(new Error("Share failed"));
-    (window as any).navigator.share = mockShare;
+    (window.navigator as NavigatorWithShare).share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 
@@ -172,7 +176,7 @@ describe("VideoMetadata", () => {
     const abortError = new Error("User cancelled");
     abortError.name = "AbortError";
     const mockShare = vi.fn().mockRejectedValue(abortError);
-    (window as any).navigator.share = mockShare;
+    (window.navigator as NavigatorWithShare).share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 

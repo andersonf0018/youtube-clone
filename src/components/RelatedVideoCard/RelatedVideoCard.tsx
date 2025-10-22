@@ -1,11 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  formatViewCount,
-  formatDuration,
-  formatTimeAgo,
-} from "@/lib/utils/formatters";
+import { formatViewCount, formatTimeAgo } from "@/lib/utils/formatters";
 
 interface RelatedVideoCardProps {
   title: string;
