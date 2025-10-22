@@ -1,15 +1,28 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { screen } from "@testing-library/react";
+import { render } from "@/test/test-utils";
 import userEvent from "@testing-library/user-event";
 import { Navigation } from "./Navigation";
+import { useSearchStore } from "@/store/search-store";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
 
 describe("Navigation", () => {
+  beforeEach(() => {
+    useSearchStore.getState().clearHistory();
+  });
+
   it("should render navigation elements", () => {
     render(<Navigation onSearch={vi.fn()} />);
 
-    expect(screen.getByRole("button", { name: /Menu/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /VideoTube/i })).toBeInTheDocument();
     expect(screen.getByRole("search")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search videos...")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Search/i })).toBeInTheDocument();
   });
 
   it("should display the logo and title", () => {
@@ -86,11 +99,11 @@ describe("Navigation", () => {
   it("should have proper accessibility attributes", () => {
     render(<Navigation onSearch={vi.fn()} />);
 
-    const menuButton = screen.getByRole("button", { name: /Menu/i });
     const searchInput = screen.getByPlaceholderText("Search videos...");
     const searchButton = screen.getByRole("button", { name: /Search/i });
+    const logo = screen.getByRole("link", { name: /VideoTube/i });
 
-    expect(menuButton).toBeInTheDocument();
+    expect(logo).toBeInTheDocument();
     expect(searchInput).toHaveAttribute("aria-label", "Search videos");
     expect(searchButton).toBeInTheDocument();
   });

@@ -33,7 +33,7 @@ export function SearchHistoryDropdown({
 
       <ul role="listbox" aria-label="Search history">
         {searchHistory.map((item) => (
-          <li key={item.timestamp} className="group">
+          <li key={`${item.query}-${item.timestamp}`} className="group">
             <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
               <Clock
                 className="w-4 h-4 text-gray-400 flex-shrink-0"

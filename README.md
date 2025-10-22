@@ -146,24 +146,121 @@ npm run test:coverage # Generate coverage report
 
 ## Testing
 
-The project includes comprehensive tests:
+This project follows a comprehensive testing strategy using **Vitest**, **React Testing Library**, and **MSW** for reliable, maintainable tests.
 
-- **Unit Tests** - Components, utilities, and stores
-- **47 Test Cases** - All passing
-- **Coverage** - Available with `npm run test:coverage`
+### Testing Stack
+
+- **Vitest** - Fast unit test runner with native ESM support
+- **React Testing Library** - Component testing focused on user behavior
+- **MSW (Mock Service Worker)** - API mocking without modifying components
+- **@testing-library/jest-dom** - Enhanced DOM matchers
+- **@testing-library/user-event** - Realistic user interaction simulation
+
+### Test Organization
+
+```
+src/
+├── test/
+│   ├── setup.ts              # Global test setup (MSW, cleanup)
+│   ├── test-utils.tsx        # Custom render with providers
+│   └── msw/
+│       └── server.ts         # MSW server configuration
+├── components/
+│   └── ComponentName/
+│       ├── ComponentName.tsx
+│       └── ComponentName.test.tsx
+└── store/
+    ├── store-name.ts
+    └── store-name.test.ts
+```
+
+### Writing Tests
+
+Use the custom `render` function from `test-utils.tsx` to automatically wrap components with required providers:
+
+```tsx
+import { render, screen } from '@/test/test-utils';
+import { createMockSession } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+
+describe('MyComponent', () => {
+  it('renders authenticated user', () => {
+    const session = createMockSession();
+    render(<MyComponent />, { session });
+
+    expect(screen.getByText('Test User')).toBeInTheDocument();
+  });
+
+  it('handles user interaction', async () => {
+    const user = userEvent.setup();
+    render(<MyComponent />);
+
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+    expect(screen.getByText(/success/i)).toBeInTheDocument();
+  });
+});
+```
+
+### API Mocking with MSW
+
+Mock API requests in individual tests using MSW handlers:
+
+```tsx
+import { server } from '@/test/msw/server';
+import { http, HttpResponse } from 'msw';
+
+it('fetches and displays videos', async () => {
+  server.use(
+    http.get('/api/youtube/popular', () => {
+      return HttpResponse.json({ items: [...mockVideos] });
+    })
+  );
+
+  render(<VideoList />);
+  expect(await screen.findByText('Video Title')).toBeInTheDocument();
+});
+```
+
+### Coverage Thresholds
+
+The project enforces strict coverage requirements:
+
+- **Lines**: 90%
+- **Functions**: 90%
+- **Branches**: 80%
+- **Statements**: 90%
+
+Excluded from coverage:
+- `node_modules/`
+- `src/test/`
+- `*.config.ts`
+- Test files (`**/*.test.{ts,tsx}`)
+- Type definitions (`**/types/**`)
 
 ### Running Tests
 
 ```bash
-# Run all tests
+# Run tests once (CI mode)
 npm test
 
-# Run tests with UI
+# Run all tests in watch mode
+npm run test:watch
+
+# Run tests with UI dashboard
 npm run test:ui
 
-# Run tests with coverage
+# Generate coverage report
 npm run test:coverage
 ```
+
+### Test Best Practices
+
+1. **Test behavior, not implementation** - Focus on what users see and do
+2. **Use accessible queries** - Prefer `getByRole`, `getByLabelText` over `getByTestId`
+3. **Mock external dependencies** - Use MSW for API calls, mock Next.js router
+4. **Avoid implementation details** - Don't test state or internal methods directly
+5. **Keep tests isolated** - Each test should be independent and repeatable
+6. **Test accessibility** - Verify ARIA attributes, keyboard navigation, screen reader support
 
 ## State Management
 

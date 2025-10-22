@@ -51,9 +51,10 @@ describe("WatchIndexPage", () => {
 
   it("should focus search input when search button is clicked", async () => {
     const user = userEvent.setup();
+    const focusSpy = vi.fn();
     const mockSearchInput = document.createElement("input");
     mockSearchInput.type = "search";
-    mockSearchInput.focus = vi.fn();
+    vi.spyOn(mockSearchInput, "focus").mockImplementation(focusSpy);
     vi.spyOn(document, "querySelector").mockReturnValue(mockSearchInput);
 
     render(<WatchIndexPage />);
@@ -61,7 +62,7 @@ describe("WatchIndexPage", () => {
     const searchButton = screen.getByRole("button", { name: /search videos/i });
     await user.click(searchButton);
 
-    expect(mockSearchInput.focus).toHaveBeenCalled();
+    expect(focusSpy).toHaveBeenCalled();
   });
 
   it("should render tip about URL format", () => {

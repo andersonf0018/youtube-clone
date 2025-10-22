@@ -7,8 +7,8 @@ describe("RelatedVideoCard", () => {
   const defaultProps = {
     title: "Related Video Title",
     channelName: "Related Channel",
-    views: "500K views",
-    uploadedAt: "1 week ago",
+    views: "500000",
+    uploadedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     duration: "10:45",
     thumbnailUrl: "https://example.com/thumb.jpg",
     onClick: vi.fn(),
@@ -19,14 +19,15 @@ describe("RelatedVideoCard", () => {
 
     expect(screen.getByText("Related Video Title")).toBeInTheDocument();
     expect(screen.getByText("Related Channel")).toBeInTheDocument();
-    expect(screen.getByText(/500K views/)).toBeInTheDocument();
-    expect(screen.getByText(/1 week ago/)).toBeInTheDocument();
+    expect(screen.getByText("500K views")).toBeInTheDocument();
+    expect(screen.getByText("1 week ago")).toBeInTheDocument();
   });
 
   it("should render thumbnail image", () => {
-    render(<RelatedVideoCard {...defaultProps} />);
+    const { container } = render(<RelatedVideoCard {...defaultProps} />);
 
-    const img = screen.getByRole("img");
+    const img = container.querySelector("img");
+    expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", expect.stringContaining("thumb.jpg"));
   });
 
@@ -50,9 +51,9 @@ describe("RelatedVideoCard", () => {
 
   it("should render without views", () => {
     const { views, ...propsWithoutViews } = defaultProps;
-    render(<RelatedVideoCard {...propsWithoutViews} uploadedAt="1 week ago" />);
+    render(<RelatedVideoCard {...propsWithoutViews} />);
 
-    expect(screen.getByText(/1 week ago/)).toBeInTheDocument();
+    expect(screen.getByText("1 week ago")).toBeInTheDocument();
     expect(screen.queryByText("views")).not.toBeInTheDocument();
   });
 
@@ -81,10 +82,14 @@ describe("RelatedVideoCard", () => {
   });
 
   it("should show separator between views and upload time", () => {
-    render(<RelatedVideoCard {...defaultProps} />);
+    const { container } = render(<RelatedVideoCard {...defaultProps} />);
 
     expect(screen.getByText("500K views")).toBeInTheDocument();
     expect(screen.getByText("1 week ago")).toBeInTheDocument();
+
+    const separator = container.querySelector('[aria-hidden="true"]');
+    expect(separator).toBeInTheDocument();
+    expect(separator?.textContent).toBe("•");
   });
 
   it("should have compact layout for sidebar", () => {

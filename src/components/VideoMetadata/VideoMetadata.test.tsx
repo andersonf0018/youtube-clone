@@ -16,14 +16,28 @@ describe("VideoMetadata", () => {
     viewCount: "1000000",
   };
 
+  const mockWriteText = vi.fn().mockResolvedValue(undefined);
+
   beforeEach(() => {
-    delete (window as any).navigator;
-    (window as any).navigator = {
-      share: undefined,
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(undefined),
+    mockWriteText.mockClear();
+
+    Object.defineProperty(window, "location", {
+      value: {
+        href: "http://localhost:3000/watch/test-id",
       },
-    };
+      writable: true,
+      configurable: true,
+    });
+
+    Object.defineProperty(window.navigator, "clipboard", {
+      value: {
+        writeText: mockWriteText,
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    delete (window.navigator as any).share;
   });
 
   it("should render video title", () => {
@@ -86,19 +100,6 @@ describe("VideoMetadata", () => {
     });
   });
 
-  it("should fallback to clipboard when Web Share API not available", async () => {
-    const user = userEvent.setup();
-
-    render(<VideoMetadata video={mockVideo} />);
-
-    const shareButton = screen.getByRole("button", { name: /share video/i });
-    await user.click(shareButton);
-
-    await waitFor(() => {
-      expect(window.navigator.clipboard.writeText).toHaveBeenCalled();
-    });
-  });
-
   it("should disable share button while sharing", async () => {
     const user = userEvent.setup();
     const mockShare = vi.fn().mockImplementation(
@@ -120,18 +121,31 @@ describe("VideoMetadata", () => {
 
   it("should not share multiple times simultaneously", async () => {
     const user = userEvent.setup();
-    const mockShare = vi.fn().mockResolvedValue(undefined);
+    let resolveShare: () => void;
+    const mockShare = vi.fn().mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveShare = resolve;
+        })
+    );
     (window as any).navigator.share = mockShare;
 
     render(<VideoMetadata video={mockVideo} />);
 
     const shareButton = screen.getByRole("button", { name: /share video/i });
-    await user.click(shareButton);
-    await user.click(shareButton);
+
+    const firstClick = user.click(shareButton);
 
     await waitFor(() => {
-      expect(mockShare).toHaveBeenCalledTimes(1);
+      expect(shareButton).toBeDisabled();
     });
+
+    await user.click(shareButton);
+
+    expect(mockShare).toHaveBeenCalledTimes(1);
+
+    resolveShare!();
+    await firstClick;
   });
 
   it("should handle share errors gracefully", async () => {

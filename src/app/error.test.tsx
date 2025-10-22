@@ -3,8 +3,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import GlobalError from "./error";
 
-vi.mock("@/components/Navigation", () => ({
-  Navigation: () => <nav data-testid="navigation">Navigation</nav>,
+vi.mock("@/components/Navigation/Navigation", () => ({
+  Navigation: () => (
+    <nav data-testid="navigation">Navigation</nav>
+  ),
 }));
 
 describe("GlobalError Page", () => {
