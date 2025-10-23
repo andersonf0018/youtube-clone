@@ -37,7 +37,7 @@ export default function Home() {
       }
       return unique;
     }, [] as typeof data.pages[0]["videos"]) ?? [];
-
+  
   return (
     <div className="min-h-screen bg-white">
       <Navigation />

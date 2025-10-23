@@ -7,6 +7,8 @@ describe("VideoCard", () => {
   const defaultProps = {
     title: "Test Video Title",
     channelName: "Test Channel",
+    channelId: "test-channel-id",
+    channelThumbnailUrl: undefined,
     views: "1.2M views",
     uploadedAt: "2 days ago",
     duration: "15:32",
@@ -26,8 +28,9 @@ describe("VideoCard", () => {
   it("should display thumbnail when provided", () => {
     render(<VideoCard {...defaultProps} thumbnailUrl="https://example.com/thumb.jpg" />);
 
-    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
-    const img = button.querySelector("img");
+    const buttons = screen.getAllByRole("button", { name: "Watch Test Video Title" });
+    const thumbnailButton = buttons[0];
+    const img = thumbnailButton.querySelector("img");
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", expect.stringContaining("thumb.jpg"));
   });
@@ -44,8 +47,8 @@ describe("VideoCard", () => {
 
     render(<VideoCard {...defaultProps} onClick={onClickMock} />);
 
-    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
-    await user.click(button);
+    const buttons = screen.getAllByRole("button", { name: "Watch Test Video Title" });
+    await user.click(buttons[0]);
 
     expect(onClickMock).toHaveBeenCalledTimes(1);
   });
@@ -53,9 +56,14 @@ describe("VideoCard", () => {
   it("should have proper accessibility attributes", () => {
     render(<VideoCard {...defaultProps} />);
 
-    const button = screen.getByRole("button", { name: /Watch Test Video Title by Test Channel/i });
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute("aria-label", "Watch Test Video Title by Test Channel");
+    const buttons = screen.getAllByRole("button", { name: "Watch Test Video Title" });
+    expect(buttons).toHaveLength(2);
+    expect(buttons[0]).toHaveAttribute("aria-label", "Watch Test Video Title");
+    expect(buttons[1]).toHaveAttribute("aria-label", "Watch Test Video Title");
+
+    const channelLink = screen.getByRole("link", { name: "Visit Test Channel channel" });
+    expect(channelLink).toBeInTheDocument();
+    expect(channelLink).toHaveAttribute("aria-label", "Visit Test Channel channel");
   });
 
   it("should display duration badge", () => {

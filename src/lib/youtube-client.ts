@@ -1,6 +1,7 @@
 import type {
   YouTubeVideosResponse,
   YouTubeSearchResponse,
+  YouTubeChannelsResponse,
   SearchParams,
   VideoParams,
   PopularVideosParams,
@@ -90,25 +91,54 @@ export const youtubeClient = {
       thumbnailUrl: string;
       channelId: string;
       channelTitle: string;
+      channelThumbnailUrl?: string;
       publishedAt: string;
+      viewCount?: string;
+      duration?: string;
     }>;
     nextPageToken?: string;
   }> {
     const response = await this.searchVideos(params);
+
+    const videoIds = response.items
+      .filter((item) => item.id.videoId)
+      .map((item) => item.id.videoId!);
+
+    if (videoIds.length === 0) {
+      return { videos: [], nextPageToken: response.nextPageToken };
+    }
+
+    const detailedVideos = await this.getVideosByIds(videoIds);
+
+    // Get unique channel IDs and fetch channel thumbnails
+    const uniqueChannelIds = [
+      ...new Set(detailedVideos.map((video) => video.channelId)),
+    ];
+
+    const channelsResponse = await fetchJSON<YouTubeChannelsResponse>(
+      `/api/youtube/channels/${uniqueChannelIds.join(",")}`
+    );
+
+    const channelThumbnails = new Map(
+      channelsResponse.items.map((channel) => [
+        channel.id,
+        channel.snippet.thumbnails.medium.url,
+      ])
+    );
+
     return {
-      videos: response.items
-        .filter((item) => item.id.videoId)
-        .map((item) => ({
-          id: item.id.videoId!,
-          title: item.snippet.title,
-          description: item.snippet.description,
-          thumbnailUrl:
-            item.snippet.thumbnails.high?.url ||
-            item.snippet.thumbnails.medium.url,
-          channelId: item.snippet.channelId,
-          channelTitle: item.snippet.channelTitle,
-          publishedAt: item.snippet.publishedAt,
-        })),
+      videos: detailedVideos.map((video) => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        thumbnailUrl: video.thumbnailUrl,
+        channelId: video.channelId,
+        channelTitle: video.channelTitle,
+        channelThumbnailUrl: channelThumbnails.get(video.channelId),
+        publishedAt: video.publishedAt,
+        viewCount: video.viewCount,
+        duration: video.duration,
+      })),
       nextPageToken: response.nextPageToken,
     };
   },
@@ -122,7 +152,22 @@ export const youtubeClient = {
       throw new YouTubeClientError("Video not found", 404);
     }
 
-    return normalizeVideo(response.items[0]);
+    const video = normalizeVideo(response.items[0]);
+
+    // Fetch channel thumbnail
+    try {
+      const channelResponse = await fetchJSON<YouTubeChannelsResponse>(
+        `/api/youtube/channels/${video.channelId}`
+      );
+
+      if (channelResponse.items.length > 0) {
+        video.channelThumbnailUrl = channelResponse.items[0].snippet.thumbnails.medium.url;
+      }
+    } catch (error) {
+      console.warn("Failed to fetch channel thumbnail:", error);
+    }
+
+    return video;
   },
 
   async getPopularVideos(
@@ -141,8 +186,35 @@ export const youtubeClient = {
       `${API_BASE_URL}/popular?${searchParams}`
     );
 
+    const videos = response.items.map(normalizeVideo);
+
+    // Get unique channel IDs and fetch channel thumbnails
+    const uniqueChannelIds = [
+      ...new Set(videos.map((video) => video.channelId)),
+    ];
+
+    try {
+      const channelsResponse = await fetchJSON<YouTubeChannelsResponse>(
+        `/api/youtube/channels/${uniqueChannelIds.join(",")}`
+      );
+
+      const channelThumbnails = new Map(
+        channelsResponse.items.map((channel) => [
+          channel.id,
+          channel.snippet.thumbnails.medium.url,
+        ])
+      );
+
+      // Add channel thumbnails to videos
+      videos.forEach((video) => {
+        video.channelThumbnailUrl = channelThumbnails.get(video.channelId);
+      });
+    } catch (error) {
+      console.warn("Failed to fetch channel thumbnails:", error);
+    }
+
     return {
-      videos: response.items.map(normalizeVideo),
+      videos,
       nextPageToken: response.nextPageToken,
     };
   },

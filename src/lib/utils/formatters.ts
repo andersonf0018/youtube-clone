@@ -1,16 +1,25 @@
+export function formatNumber(value: string | number): string {
+  const num = typeof value === "string" ? parseInt(value) : value;
+
+  if (isNaN(num)) return "0";
+
+  if (num >= 1000000000) {
+    return `${(num / 1000000000).toFixed(1)}B`;
+  }
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(0)}K`;
+  }
+  return num.toLocaleString();
+}
+
+
 export function formatViewCount(viewCount?: string): string {
   if (!viewCount) return "0 views";
 
-  const count = parseInt(viewCount);
-  if (isNaN(count)) return "0 views";
-
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1)}M views`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(0)}K views`;
-  }
-  return `${count} views`;
+  return `${formatNumber(viewCount)} views`;
 }
 
 export function formatDuration(duration?: string): string {

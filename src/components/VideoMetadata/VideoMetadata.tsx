@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Share2 } from "lucide-react";
 import type { NormalizedVideo } from "@/types/youtube";
 import { formatViewCount, formatTimeAgo } from "@/lib/utils/formatters";
+import { SubscribeButton } from "@/components/SubscribeButton";
 
 interface VideoMetadataProps {
   video: NormalizedVideo;
@@ -44,18 +47,41 @@ export function VideoMetadata({ video }: VideoMetadataProps) {
 
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-sm font-semibold text-gray-600">
-                {video.channelTitle.charAt(0).toUpperCase()}
-              </span>
-            </div>
+          <Link
+            href={`/channel/${video.channelId}`}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full cursor-pointer"
+            aria-label={`Visit ${video.channelTitle} channel`}
+          >
+            {video.channelThumbnailUrl ? (
+              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                <Image
+                  src={video.channelThumbnailUrl}
+                  alt=""
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                  priority={false}
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-sm font-semibold text-gray-600">
+                  {video.channelTitle.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
             <div>
-              <h2 className="font-semibold text-gray-900">
+              <h2 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                 {video.channelTitle}
               </h2>
             </div>
-          </div>
+          </Link>
+
+          <SubscribeButton
+            channelId={video.channelId}
+            channelTitle={video.channelTitle}
+            variant="compact"
+          />
         </div>
 
         <div className="flex items-center gap-2">

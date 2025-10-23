@@ -14,6 +14,7 @@ interface VideoGridProps {
   isLoading?: boolean;
   onVideoClick: (videoId: string) => void;
   skeletonCount?: number;
+  hideChannelAvatar?: boolean;
 }
 
 export function VideoGrid({
@@ -21,6 +22,7 @@ export function VideoGrid({
   isLoading = false,
   onVideoClick,
   skeletonCount = 12,
+  hideChannelAvatar = false,
 }: VideoGridProps) {
   if (isLoading) {
     return (
@@ -47,11 +49,14 @@ export function VideoGrid({
           key={video.id}
           title={video.title}
           channelName={video.channelTitle}
+          channelId={video.channelId}
+          channelThumbnailUrl={video.channelThumbnailUrl}
           views={formatViewCount(video.viewCount)}
           uploadedAt={formatTimeAgo(video.publishedAt)}
           duration={formatDuration(video.duration)}
           thumbnailUrl={video.thumbnailUrl}
           onClick={() => onVideoClick(video.id)}
+          hideChannelAvatar={hideChannelAvatar}
         />
       ))}
     </div>
