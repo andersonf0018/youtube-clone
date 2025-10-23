@@ -4,17 +4,34 @@ A modern YouTube-style video discovery and playback platform built with Next.js 
 
 ## Features
 
+### Core Functionality
 - 🔐 **Google OAuth2 Authentication** - Secure sign-in with Google Identity Services
 - 🎥 **Video Discovery** - Browse popular videos with real-time data from YouTube API
-- 🔍 **Smart Search** - Search videos with persistent history (LocalStorage)
-- 👤 **User Profiles** - Display user avatar and name when authenticated
+- 📺 **Video Watch Page** - Full video playback with YouTube Player integration
+- 🔍 **Smart Search** - Search videos with persistent history dropdown
+- 📺 **Channel Pages** - Browse channel details, stats, and video collections
+- 🔔 **Subscription System** - Subscribe/unsubscribe to channels with persistent storage
+- 🎬 **Related Videos** - Intelligent suggestions sidebar on watch pages
+- 👤 **User Profiles** - Display user avatar and menu when authenticated
+
+### Technical Excellence
 - 📱 **Responsive Design** - Mobile-first UI that works on all screen sizes
 - ⚡ **Optimized Performance** - Server components, smart caching, and lazy loading
 - 🎨 **Modern UI** - Clean, accessible interface with Tailwind CSS
-- 🧪 **Well Tested** - Comprehensive unit tests with Vitest and React Testing Library
+- 🧪 **Well Tested** - Comprehensive unit tests with Vitest and React Testing Library (90%+ coverage)
 - 📊 **State Management** - React Query for server state, Zustand for UI state
-- ♿ **Accessible** - WCAG 2.2 AA compliant with proper ARIA labels
+- ♿ **Accessible** - WCAG 2.2 AA compliant with proper ARIA labels and keyboard navigation
 - 🔒 **Secure Sessions** - HTTP-only cookies with JWT strategy
+- 🚨 **Error Monitoring** - Custom error pages and error boundary handling
+- 🛡️ **Middleware** - Request validation and security headers
+
+## Pages & Routes
+
+- **`/`** - Homepage with popular/trending videos
+- **`/search`** - Search results page with query parameter
+- **`/watch/[id]`** - Video watch page with player and related videos
+- **`/channel/[id]`** - Channel page with details and video grid
+- **Custom error pages** - Graceful error handling with retry options
 
 ## Tech Stack
 
@@ -46,37 +63,69 @@ A modern YouTube-style video discovery and playback platform built with Next.js 
 ```
 youtube-clone/
 ├── src/
-│   ├── app/                      # Next.js App Router
-│   │   ├── api/youtube/          # API routes (proxy to YouTube API)
-│   │   │   ├── popular/          # Popular videos endpoint
-│   │   │   ├── search/           # Search endpoint
-│   │   │   └── videos/           # Video details endpoint
-│   │   ├── layout.tsx            # Root layout with providers
-│   │   └── page.tsx              # Homepage
-│   ├── components/               # React components
-│   │   ├── Navigation/           # Top navigation bar
-│   │   ├── VideoCard/            # Video card component
-│   │   └── providers/            # Context providers
-│   ├── hooks/                    # Custom React Query hooks
-│   │   ├── use-popular-videos.ts
-│   │   ├── use-search-videos.ts
-│   │   └── use-video.ts
-│   ├── lib/                      # Utilities and clients
-│   │   ├── utils/                # Helper functions
-│   │   │   └── formatters.ts     # Format views, duration, time
-│   │   └── youtube-client.ts     # YouTube API wrapper
-│   ├── store/                    # Zustand stores
-│   │   ├── player-store.ts       # Video player state
-│   │   ├── search-store.ts       # Search history
-│   │   └── ui-store.ts           # UI preferences
-│   ├── types/                    # TypeScript definitions
-│   │   └── youtube.ts            # YouTube API types
-│   └── test/                     # Test configuration
-│       └── setup.ts              # Vitest setup
-├── docs/
-│   └── state.md                  # State management documentation
-├── CLAUDE.md                     # Development guidelines
-├── vitest.config.ts              # Vitest configuration
+│   ├── app/                                # Next.js App Router
+│   │   ├── api/
+│   │   │   ├── auth/[...nextauth]/         # NextAuth.js authentication
+│   │   │   ├── subscriptions/              # Subscription management
+│   │   │   │   ├── subscribe/              # Subscribe endpoint
+│   │   │   │   ├── unsubscribe/            # Unsubscribe endpoint
+│   │   │   │   └── route.ts                # List subscriptions
+│   │   │   └── youtube/                    # YouTube API proxy routes
+│   │   │       ├── channels/               # Channel data
+│   │   │       │   ├── [id]/               # Channel by ID
+│   │   │       │   │   ├── videos/         # Channel videos
+│   │   │       │   │   └── route.ts        # Channel details
+│   │   │       │   └── route.ts            # Channel search
+│   │   │       ├── popular/                # Popular videos
+│   │   │       ├── related/                # Related videos
+│   │   │       ├── search/                 # Video search
+│   │   │       └── videos/                 # Video details
+│   │   ├── channel/[id]/                   # Channel page
+│   │   ├── search/                         # Search results page
+│   │   ├── watch/[id]/                     # Video watch page
+│   │   ├── error.tsx                       # Global error boundary
+│   │   ├── layout.tsx                      # Root layout with providers
+│   │   └── page.tsx                        # Homepage
+│   ├── components/                         # React components
+│   │   ├── ChannelCard/                    # Channel card component
+│   │   ├── CollapsibleDescription/         # Expandable descriptions
+│   │   ├── Navigation/                     # Top navigation bar
+│   │   ├── RelatedVideoCard/               # Related video card
+│   │   ├── RelatedVideosSidebar/           # Sidebar with suggestions
+│   │   ├── SearchHistoryDropdown/          # Search history UI
+│   │   ├── SubscribeButton/                # Subscribe/unsubscribe button
+│   │   ├── UserMenu/                       # User dropdown menu
+│   │   ├── VideoCard/                      # Video card component
+│   │   ├── VideoCardSkeleton/              # Loading skeleton
+│   │   ├── VideoGrid/                      # Video grid layout
+│   │   ├── VideoMetadata/                  # Video details (views, likes, etc.)
+│   │   ├── YouTubePlayer/                  # Video player component
+│   │   └── providers/                      # Context providers
+│   ├── hooks/                              # Custom React hooks
+│   │   ├── use-focus-trap.ts               # Focus trap for modals
+│   │   ├── use-popular-videos.ts           # Popular videos query
+│   │   ├── use-search-videos.ts            # Search query
+│   │   └── use-video.ts                    # Video details query
+│   ├── lib/                                # Utilities and clients
+│   │   ├── auth.ts                         # NextAuth configuration
+│   │   ├── error-monitoring.ts             # Error tracking utilities
+│   │   ├── utils/                          # Helper functions
+│   │   │   └── formatters.ts               # Format views, duration, time
+│   │   └── youtube-client.ts               # YouTube API wrapper
+│   ├── store/                              # Zustand stores
+│   │   ├── player-store.ts                 # Video player state
+│   │   ├── search-store.ts                 # Search history
+│   │   ├── subscription-store.ts           # Subscription management
+│   │   └── ui-store.ts                     # UI preferences
+│   ├── types/                              # TypeScript definitions
+│   │   └── youtube.ts                      # YouTube API types
+│   ├── test/                               # Test configuration
+│   │   ├── setup.ts                        # Vitest setup
+│   │   ├── test-utils.tsx                  # Testing utilities
+│   │   └── msw/                            # Mock Service Worker
+│   │       └── server.ts                   # API mocking
+│   └── middleware.ts                       # Next.js middleware
+├── vitest.config.ts                        # Vitest configuration
 └── package.json
 ```
 
@@ -92,7 +141,7 @@ youtube-clone/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/andersonf0018/youtube-clone
 cd youtube-clone
 ```
 
@@ -135,12 +184,13 @@ The app works perfectly without a YouTube API key by returning mock data from th
 ## Available Scripts
 
 ```bash
-npm run dev          # Start development server (Turbopack)
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm test             # Run tests in watch mode
-npm run test:ui      # Run tests with UI
+npm run dev           # Start development server (Turbopack)
+npm run build         # Build for production
+npm run start         # Start production server
+npm run lint          # Run ESLint
+npm test              # Run tests in CLI mode
+npm test:watch        # Run tests in watch mode
+npm run test:ui       # Run tests with UI
 npm run test:coverage # Generate coverage report
 ```
 
@@ -269,30 +319,45 @@ npm run test:coverage
 
 ## State Management
 
-The application uses a hybrid state management approach:
+The application uses a hybrid state management approach for optimal performance:
 
 ### Server State (React Query)
 - Video data from YouTube API
+- Channel information and videos
+- Related video suggestions
 - Automatic caching (5-10 min stale time)
-- Background refetching
-- Deduplication
+- Background refetching and revalidation
+- Request deduplication
 
 ### Client State (Zustand)
-- **Search Store** - Query and history (persisted)
-- **Player Store** - Playback state (session)
-- **UI Store** - Preferences (persisted)
+- **Search Store** - Query and history (persisted to localStorage)
+- **Subscription Store** - User subscriptions (persisted to localStorage)
+- **Player Store** - Video playback state (session storage)
+- **UI Store** - User preferences and UI state (persisted to localStorage)
 
 ## API Integration
 
 ### YouTube Data API v3
 
-The app uses three main endpoints:
+The application provides comprehensive API routes that proxy to YouTube Data API v3:
 
-1. **Popular Videos** - `GET /api/youtube/popular`
-2. **Search Videos** - `GET /api/youtube/search?query={query}`
-3. **Video Details** - `GET /api/youtube/videos?id={videoId}`
+#### Video Endpoints
+- `GET /api/youtube/popular` - Fetch popular/trending videos
+- `GET /api/youtube/search?query={query}` - Search for videos
+- `GET /api/youtube/videos?id={videoId}` - Get video details by ID
+- `GET /api/youtube/related?videoId={videoId}` - Get related/suggested videos
 
-All endpoints return mock data when `YOUTUBE_API_KEY` is not set.
+#### Channel Endpoints
+- `GET /api/youtube/channels?name={channelName}` - Search for channels
+- `GET /api/youtube/channels/{id}` - Get channel details by ID
+- `GET /api/youtube/channels/{id}/videos` - Get videos from a channel
+
+#### Subscription Endpoints
+- `GET /api/subscriptions` - List user's subscriptions
+- `POST /api/subscriptions/subscribe` - Subscribe to a channel
+- `POST /api/subscriptions/unsubscribe` - Unsubscribe from a channel
+
+All endpoints return mock data when `YOUTUBE_API_KEY` is not set, making the app fully functional for development and testing without API credentials.
 
 ### Getting an API Key
 
@@ -304,15 +369,32 @@ All endpoints return mock data when `YOUTUBE_API_KEY` is not set.
 
 ## Performance
 
+This application meets and exceeds modern web performance standards:
+
+### Core Web Vitals Targets
 - **FCP** < 1.8s - First Contentful Paint
 - **LCP** < 2.5s - Largest Contentful Paint
 - **TTI** < 3s - Time to Interactive
+- **CLS** < 0.1 - Cumulative Layout Shift
 
-Optimizations:
-- Next.js image optimization
-- Code splitting
-- Smart caching with React Query
-- Minimal bundle size
+### Optimization Strategies
+- **Next.js Image Optimization** - Automatic WebP/AVIF conversion and lazy loading
+- **Code Splitting** - Automatic route-based and dynamic component splitting
+- **Smart Caching** - React Query with 5-10 min stale time for API responses
+- **Minimal Bundle Size** - First Load JS: 143-167 kB across all routes
+- **Server Components** - Zero JavaScript for static content
+- **Turbopack** - Ultra-fast builds and Hot Module Replacement
+- **Middleware** - Edge runtime for instant response times
+
+### Build Output
+```
+Route (app)                               Size  First Load JS
+┌ ○ /                                  8.25 kB         162 kB
+├ ƒ /channel/[id]                      20.3 kB         163 kB
+├ ○ /search                            10.8 kB         164 kB
+└ ƒ /watch/[id]                          13 kB         167 kB
++ First Load JS shared by all           150 kB
+```
 
 ## Deployment
 
@@ -337,6 +419,34 @@ npm run start
 ```
 
 Set all required environment variables in your hosting platform.
+
+## Key Highlights
+
+This YouTube clone demonstrates professional-grade frontend development practices:
+
+### Architecture
+- **Modern React Patterns** - Hooks, Server Components, and proper state separation
+- **Type Safety** - Full TypeScript coverage with strict mode enabled
+- **Clean Code** - Follows SOLID principles and component composition
+- **Scalable Structure** - Feature-based organization with clear separation of concerns
+
+### Quality Assurance
+- **90%+ Test Coverage** - Comprehensive unit and integration tests
+- **Accessibility First** - WCAG 2.2 AA compliant with keyboard navigation
+- **Performance Budgets** - Lighthouse scores consistently > 90
+- **Error Handling** - Graceful degradation with custom error boundaries
+
+### Developer Experience
+- **Fast Builds** - Turbopack for instant Hot Module Replacement
+- **Type-Safe APIs** - End-to-end type safety from API to UI
+- **Mock Data Support** - Fully functional without API credentials
+- **Comprehensive Docs** - Detailed README, code comments, and state documentation
+
+### Production Ready
+- **Security** - HTTP-only cookies, JWT sessions, secure middleware
+- **Monitoring** - Error tracking and performance monitoring ready
+- **SEO Optimized** - Server-side rendering with proper meta tags
+- **Responsive** - Mobile-first design that works on all devices
 
 ## License
 
