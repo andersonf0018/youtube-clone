@@ -25,16 +25,9 @@ export function SubscribeButton({
     subscribe,
     unsubscribe,
     isSubscribed: checkSubscribed,
-    loadSubscriptions,
   } = useSubscriptionStore();
 
   const isSubscribed = checkSubscribed(channelId);
-
-  useEffect(() => {
-    if (session) {
-      loadSubscriptions();
-    }
-  }, [session, loadSubscriptions]);
 
   const handleSubscribeClick = async (e?: React.MouseEvent) => {
     if (e) {

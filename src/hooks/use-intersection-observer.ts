@@ -14,11 +14,38 @@ export function useIntersectionObserver(
 
   useEffect(() => {
     const target = targetRef.current;
-    if (!target) return;
+    if (!target) {
+      setIsIntersecting(false);
+      return;
+    }
+
+    let hasCheckedInitial = false;
+    let initiallyVisible = false;
+
+    const checkInitialIntersection = () => {
+      if (!target || hasCheckedInitial) return;
+      hasCheckedInitial = true;
+      
+      const rect = target.getBoundingClientRect();
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      const marginValue = parseInt(rootMargin) || 200;
+      const isVisible = rect.top <= windowHeight + marginValue && rect.bottom > 0;
+      
+      if (isVisible) {
+        initiallyVisible = true;
+        setIsIntersecting(true);
+      }
+    };
+
+    checkInitialIntersection();
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsIntersecting(entry.isIntersecting);
+        if (!hasCheckedInitial || !initiallyVisible) {
+          setIsIntersecting(entry.isIntersecting);
+        } else if (entry.isIntersecting) {
+          setIsIntersecting(true);
+        }
       },
       { threshold, rootMargin }
     );

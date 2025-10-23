@@ -18,14 +18,28 @@ function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("q") || "";
+  const tabParam = searchParams.get("tab") as SearchTab | null;
   const { setCurrentQuery } = useSearchStore();
-  const [activeTab, setActiveTab] = useState<SearchTab>("videos");
+  const [activeTab, setActiveTab] = useState<SearchTab>(tabParam || "videos");
 
   useEffect(() => {
     if (query) {
       setCurrentQuery(query);
     }
   }, [query, setCurrentQuery]);
+
+  useEffect(() => {
+    if (tabParam && (tabParam === "videos" || tabParam === "channels")) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab: SearchTab) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.push(`/search?${params.toString()}`, { scroll: false });
+  };
 
   const {
     data: videoData,
@@ -59,29 +73,7 @@ function SearchContent() {
   );
 
   const { targetRef: videosTargetRef, isIntersecting: videosIntersecting } = useIntersectionObserver();
-  const { targetRef: channelsTargetRef, isIntersecting: channelsIntersecting } = useIntersectionObserver();
-
-  useEffect(() => {
-    if (videosIntersecting && hasNextVideosPage && !isFetchingNextVideos) {
-      fetchNextVideos();
-    }
-  }, [
-    videosIntersecting,
-    hasNextVideosPage,
-    isFetchingNextVideos,
-    fetchNextVideos,
-  ]);
-
-  useEffect(() => {
-    if (channelsIntersecting && hasNextChannelsPage && !isFetchingNextChannels) {
-      fetchNextChannels();
-    }
-  }, [
-    channelsIntersecting,
-    hasNextChannelsPage,
-    isFetchingNextChannels,
-    fetchNextChannels,
-  ]);
+  const [canFetchMore, setCanFetchMore] = useState(true);
 
   const handleVideoClick = (videoId: string) => {
     router.push(`/watch/${videoId}`);
@@ -118,6 +110,22 @@ function SearchContent() {
         },
         [] as NormalizedChannel[]
       ) ?? [];
+
+  useEffect(() => {
+    if (activeTab === "videos" && videosIntersecting && hasNextVideosPage && !isFetchingNextVideos && canFetchMore) {
+      fetchNextVideos().then(() => {
+        setCanFetchMore(false);
+        setTimeout(() => setCanFetchMore(true), 500);
+      });
+    }
+  }, [
+    activeTab,
+    videosIntersecting,
+    hasNextVideosPage,
+    isFetchingNextVideos,
+    fetchNextVideos,
+    canFetchMore,
+  ]);
 
   const isLoading = activeTab === "videos" ? videosLoading : channelsLoading;
   const error = activeTab === "videos" ? videosError : channelsError;
@@ -158,7 +166,7 @@ function SearchContent() {
               <nav className="-mb-px flex gap-8" aria-label="Search tabs">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("videos")}
+                  onClick={() => handleTabChange("videos")}
                   className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer focus:outline-none ${
                     activeTab === "videos"
                       ? "border-blue-600 text-blue-600"
@@ -170,7 +178,7 @@ function SearchContent() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("channels")}
+                  onClick={() => handleTabChange("channels")}
                   className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer focus:outline-none ${
                     activeTab === "channels"
                       ? "border-blue-600 text-blue-600"
@@ -287,25 +295,44 @@ function SearchContent() {
                   </div>
                 )}
 
-                {isFetchingNextPage && (
-                  <div className="space-y-4 mt-4">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div
-                        key={`loading-${index}`}
-                        className="flex gap-4 p-4 rounded-xl bg-gray-100 animate-pulse"
-                      >
-                        <div className="flex-shrink-0 w-32 h-32 rounded-full bg-gray-300" />
-                        <div className="flex-1 space-y-3">
-                          <div className="h-6 bg-gray-300 rounded w-1/3" />
-                          <div className="h-4 bg-gray-300 rounded w-1/4" />
-                          <div className="h-4 bg-gray-300 rounded w-2/3" />
-                        </div>
-                      </div>
-                    ))}
+                {!isLoading && hasNextPage && (
+                  <div className="flex items-center justify-center py-8">
+                    <button
+                      type="button"
+                      onClick={() => fetchNextChannels()}
+                      disabled={isFetchingNextPage}
+                      className="px-6 py-3 bg-gray-100 text-gray-900 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isFetchingNextPage ? (
+                        <span className="flex items-center gap-2">
+                          <svg
+                            className="animate-spin h-5 w-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          Loading...
+                        </span>
+                      ) : (
+                        "Load more channels"
+                      )}
+                    </button>
                   </div>
                 )}
-
-                <div ref={channelsTargetRef} className="h-20" aria-hidden="true" />
 
                 {!isLoading && !hasNextPage && allChannels.length > 0 && (
                   <div className="flex items-center justify-center py-8">
