@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,7 +17,7 @@ interface VideoCardProps {
   hideChannelAvatar?: boolean;
 }
 
-export function VideoCard({
+export const VideoCard = memo(function VideoCard({
   title,
   channelName,
   channelId,
@@ -111,4 +112,4 @@ export function VideoCard({
       </div>
     </article>
   );
-}
+});

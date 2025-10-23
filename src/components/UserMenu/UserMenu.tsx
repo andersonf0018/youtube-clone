@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 import type { Session } from "next-auth";
@@ -29,9 +30,9 @@ export function UserMenu({ session }: UserMenuProps) {
     };
   }, [isOpen]);
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: "/" });
-  };
+  }, []);
 
   return (
     <div className="relative" ref={menuRef}>
@@ -44,12 +45,15 @@ export function UserMenu({ session }: UserMenuProps) {
         aria-haspopup="true"
       >
         {session.user.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.user.image}
-            alt={session.user.name || "User"}
-            className="w-8 h-8 rounded-full"
-          />
+          <div className="relative w-8 h-8 rounded-full overflow-hidden">
+            <Image
+              src={session.user.image}
+              alt={session.user.name || "User"}
+              fill
+              sizes="32px"
+              className="object-cover"
+            />
+          </div>
         ) : (
           <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold">
             {session.user.name?.charAt(0).toUpperCase() || "U"}
@@ -66,12 +70,15 @@ export function UserMenu({ session }: UserMenuProps) {
           <div className="px-4 py-3 border-b border-gray-200">
             <div className="flex items-center gap-3">
               {session.user.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={session.user.image}
-                  alt={session.user.name || "User"}
-                  className="w-10 h-10 rounded-full"
-                />
+                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                  <Image
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold">
                   {session.user.name?.charAt(0).toUpperCase() || "U"}

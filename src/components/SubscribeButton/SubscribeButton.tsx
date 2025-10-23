@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useSubscriptionStore } from "@/store/subscription-store";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface SubscribeButtonProps {
   channelId: string;
@@ -20,6 +21,7 @@ export function SubscribeButton({
   const { data: session } = useSession();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const modalRef = useFocusTrap(showLoginModal);
 
   const {
     subscribe,
@@ -123,6 +125,7 @@ export function SubscribeButton({
           aria-labelledby="login-modal-title"
         >
           <div
+            ref={modalRef}
             className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -147,6 +150,7 @@ export function SubscribeButton({
               <button
                 type="button"
                 onClick={() => setShowLoginModal(false)}
+                data-close-modal="true"
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-900 font-medium rounded-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer"
               >
                 Cancel

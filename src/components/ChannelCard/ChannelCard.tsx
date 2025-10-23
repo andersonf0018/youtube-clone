@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Image from "next/image";
 import { formatNumber } from "@/lib/utils/formatters";
 import { SubscribeButton } from "@/components/SubscribeButton";
@@ -13,7 +14,7 @@ interface ChannelCardProps {
   onClick: () => void;
 }
 
-export function ChannelCard({
+export const ChannelCard = memo(function ChannelCard({
   id,
   title,
   description,
@@ -77,4 +78,4 @@ export function ChannelCard({
       </article>
     </>
   );
-}
+});

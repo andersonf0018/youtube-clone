@@ -1,4 +1,6 @@
-export function VideoCardSkeleton() {
+import { memo } from "react";
+
+export const VideoCardSkeleton = memo(function VideoCardSkeleton() {
   return (
     <article className="flex flex-col gap-3 animate-pulse">
       <div className="relative w-full aspect-video bg-gray-200 rounded-xl overflow-hidden" />
@@ -18,4 +20,4 @@ export function VideoCardSkeleton() {
       </div>
     </article>
   );
-}
+});

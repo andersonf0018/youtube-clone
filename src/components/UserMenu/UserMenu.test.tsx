@@ -36,7 +36,8 @@ describe("UserMenu", () => {
 
     const avatar = screen.getByAltText(mockSession.user.name);
     expect(avatar).toBeInTheDocument();
-    expect(avatar).toHaveAttribute("src", mockSession.user.image);
+    expect(avatar).toHaveAttribute("src");
+    expect(avatar.getAttribute("src")).toContain(encodeURIComponent(mockSession.user.image));
   });
 
   it("should display user initials when no image available", () => {

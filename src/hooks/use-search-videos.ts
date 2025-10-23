@@ -5,7 +5,7 @@ import type { SearchParams } from "@/types/youtube";
 export function useSearchVideos(params: SearchParams, enabled = true) {
   return useQuery({
     queryKey: ["videos", "search", params.query, params],
-    queryFn: () => youtubeClient.searchVideos(params),
+    queryFn: ({ signal }) => youtubeClient.searchVideos(params, signal),
     enabled: enabled && !!params.query,
     staleTime: 5 * 60 * 1000,
   });

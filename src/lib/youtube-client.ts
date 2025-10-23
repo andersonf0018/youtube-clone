@@ -21,12 +21,16 @@ class YouTubeClientError extends Error {
   }
 }
 
-async function fetchJSON<T>(url: string): Promise<T> {
+async function fetchJSON<T>(
+  url: string,
+  signal?: AbortSignal
+): Promise<T> {
   try {
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
       },
+      signal,
     });
 
     if (!response.ok) {
@@ -69,7 +73,10 @@ function normalizeVideo(
 }
 
 export const youtubeClient = {
-  async searchVideos(params: SearchParams): Promise<YouTubeSearchResponse> {
+  async searchVideos(
+    params: SearchParams,
+    signal?: AbortSignal
+  ): Promise<YouTubeSearchResponse> {
     const searchParams = new URLSearchParams({
       query: params.query,
       maxResults: String(params.maxResults ?? 20),
@@ -79,7 +86,8 @@ export const youtubeClient = {
     });
 
     return fetchJSON<YouTubeSearchResponse>(
-      `${API_BASE_URL}/search?${searchParams}`
+      `${API_BASE_URL}/search?${searchParams}`,
+      signal
     );
   },
 

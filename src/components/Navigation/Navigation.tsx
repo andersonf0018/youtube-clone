@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
@@ -35,7 +35,7 @@ export function Navigation({ onSearch }: NavigationProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const performSearch = (query: string) => {
+  const performSearch = useCallback((query: string) => {
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return;
 
@@ -47,7 +47,7 @@ export function Navigation({ onSearch }: NavigationProps) {
     } else {
       router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     }
-  };
+  }, [addToHistory, onSearch, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

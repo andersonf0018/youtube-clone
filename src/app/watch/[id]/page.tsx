@@ -1,12 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
-import { YouTubePlayer } from "@/components/YouTubePlayer";
 import { VideoMetadata } from "@/components/VideoMetadata";
 import { CollapsibleDescription } from "@/components/CollapsibleDescription";
 import { RelatedVideosSidebar } from "@/components/RelatedVideosSidebar";
 import { useVideo } from "@/hooks/use-video";
+
+const YouTubePlayer = dynamic(
+  () => import("@/components/YouTubePlayer").then((mod) => ({ default: mod.YouTubePlayer })),
+  {
+    loading: () => (
+      <div className="relative w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+        <div className="text-white text-sm">Loading player...</div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export default function WatchPage() {
   const params = useParams();
@@ -23,7 +35,7 @@ export default function WatchPage() {
     <div className="min-h-screen bg-white">
       <Navigation />
 
-      <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
+      <main id="main-content" className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
         {error && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="text-center max-w-md">

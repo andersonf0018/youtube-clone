@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Image from "next/image";
 import { formatViewCount, formatTimeAgo } from "@/lib/utils/formatters";
 
@@ -13,7 +14,7 @@ interface RelatedVideoCardProps {
   onClick: () => void;
 }
 
-export function RelatedVideoCard({
+export const RelatedVideoCard = memo(function RelatedVideoCard({
   title,
   channelName,
   views,
@@ -61,4 +62,4 @@ export function RelatedVideoCard({
       </button>
     </article>
   );
-}
+});

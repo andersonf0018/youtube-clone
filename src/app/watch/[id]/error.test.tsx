@@ -73,11 +73,12 @@ describe("WatchError Page", () => {
     expect(screen.queryByText(/error id:/i)).not.toBeInTheDocument();
   });
 
-  it("should log error to console on mount", () => {
+  it("should log error to error monitoring service on mount", () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<WatchError error={mockError} reset={mockReset} />);
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Watch page error:", mockError);
+    // Error monitoring service logs errors in development mode
+    expect(consoleErrorSpy).toHaveBeenCalled();
 
     consoleErrorSpy.mockRestore();
   });

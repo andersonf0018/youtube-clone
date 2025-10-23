@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Navigation } from "@/components/Navigation";
 import { AlertCircle, Home, RefreshCw } from "lucide-react";
+import { errorMonitoring } from "@/lib/error-monitoring";
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -12,7 +13,10 @@ interface ErrorProps {
 
 export default function GlobalError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error("Application error:", error);
+    errorMonitoring.logError(error, {
+      component: "GlobalErrorBoundary",
+      digest: error.digest,
+    });
   }, [error]);
 
   return (

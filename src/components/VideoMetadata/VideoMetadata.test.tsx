@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, render } from "@/test/test-utils";
 import userEvent from "@testing-library/user-event";
 import { VideoMetadata } from "./VideoMetadata";
 import type { NormalizedVideo } from "@/types/youtube";

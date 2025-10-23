@@ -9,7 +9,7 @@ export function usePopularVideos(params: PopularVideosParams = {}) {
       const result = await youtubeClient.getPopularVideos(params);
       return result.videos;
     },
-    staleTime: 5 * 60 * 1000 * 60,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

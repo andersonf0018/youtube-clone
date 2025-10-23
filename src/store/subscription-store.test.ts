@@ -1,12 +1,20 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll, afterAll, vi } from "vitest";
 import { useSubscriptionStore } from "./subscription-store";
+import { server } from "@/test/msw/server";
 
-// Mock fetch
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
 
 describe("useSubscriptionStore", () => {
+  beforeAll(() => {
+    server.close();
+    global.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  afterAll(() => {
+    server.listen({ onUnhandledRequest: "error" });
+  });
+
   beforeEach(() => {
-    // Reset store before each test
     useSubscriptionStore.setState({
       subscriptions: new Set(),
       subscriberCounts: new Map(),
@@ -46,17 +54,17 @@ describe("useSubscriptionStore", () => {
   });
 
   it("should subscribe to a channel", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ subscriberCount: 1001 }),
-    });
+    } as Response);
 
     const { subscribe, isSubscribed } = useSubscriptionStore.getState();
 
     await subscribe("channel1");
 
     expect(isSubscribed("channel1")).toBe(true);
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledWith(
       "/api/subscriptions/subscribe",
       expect.objectContaining({
         method: "POST",
@@ -67,10 +75,10 @@ describe("useSubscriptionStore", () => {
   });
 
   it("should unsubscribe from a channel", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ subscriberCount: 999 }),
-    });
+    } as Response);
 
     useSubscriptionStore.setState({
       subscriptions: new Set(["channel1"]),
@@ -81,7 +89,7 @@ describe("useSubscriptionStore", () => {
     await unsubscribe("channel1");
 
     expect(isSubscribed("channel1")).toBe(false);
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledWith(
       "/api/subscriptions/unsubscribe",
       expect.objectContaining({
         method: "POST",
@@ -92,9 +100,9 @@ describe("useSubscriptionStore", () => {
   });
 
   it("should handle subscribe error", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: false,
-    });
+    } as Response);
 
     const { subscribe } = useSubscriptionStore.getState();
 
@@ -102,10 +110,10 @@ describe("useSubscriptionStore", () => {
   });
 
   it("should load subscriptions", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ subscriptions: ["channel1", "channel2"] }),
-    });
+    } as Response);
 
     const { loadSubscriptions, isSubscribed } = useSubscriptionStore.getState();
 

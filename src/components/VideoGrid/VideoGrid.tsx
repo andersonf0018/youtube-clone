@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { VideoCard } from "@/components/VideoCard";
 import { VideoCardSkeleton } from "@/components/VideoCardSkeleton";
 import type { NormalizedVideo } from "@/types/youtube";
@@ -24,6 +25,10 @@ export function VideoGrid({
   skeletonCount = 12,
   hideChannelAvatar = false,
 }: VideoGridProps) {
+  const handleVideoClick = useCallback(
+    (videoId: string) => () => onVideoClick(videoId),
+    [onVideoClick]
+  );
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8">
@@ -55,7 +60,7 @@ export function VideoGrid({
           uploadedAt={formatTimeAgo(video.publishedAt)}
           duration={formatDuration(video.duration)}
           thumbnailUrl={video.thumbnailUrl}
-          onClick={() => onVideoClick(video.id)}
+          onClick={handleVideoClick(video.id)}
           hideChannelAvatar={hideChannelAvatar}
         />
       ))}

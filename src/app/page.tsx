@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { VideoGrid } from "@/components/VideoGrid";
@@ -26,9 +26,9 @@ export default function Home() {
     }
   }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleVideoClick = (videoId: string) => {
+  const handleVideoClick = useCallback((videoId: string) => {
     router.push(`/watch/${videoId}`);
-  };
+  }, [router]);
 
   const allVideos =
     data?.pages.flatMap((page) => page.videos).reduce((unique, video) => {
@@ -37,12 +37,15 @@ export default function Home() {
       }
       return unique;
     }, [] as typeof data.pages[0]["videos"]) ?? [];
+
+  // Note: For very large lists (>500 items), consider implementing virtualization
+  // using react-window's FixedSizeGrid component for improved performance.
   
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
 
-      <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
+      <main id="main-content" className="pt-20 px-4 sm:px-6 lg:px-8 max-w-[2000px] mx-auto pb-8">
         {error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center max-w-md">

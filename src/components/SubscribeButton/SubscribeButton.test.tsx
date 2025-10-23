@@ -107,18 +107,6 @@ describe("SubscribeButton", () => {
     });
   });
 
-  it("loads subscriptions when user is authenticated", () => {
-    (useSession as ReturnType<typeof vi.fn>).mockReturnValue({
-      data: mockSession,
-      status: "authenticated",
-    });
-
-    render(
-      <SubscribeButton channelId="test-channel" channelTitle="Test Channel" />
-    );
-
-    expect(mockLoadSubscriptions).toHaveBeenCalled();
-  });
 
   it("applies compact variant classes", () => {
     render(
